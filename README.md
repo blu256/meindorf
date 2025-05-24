@@ -20,8 +20,11 @@ See the IDEAS.md file for what might be coming in the future. If you can help ma
 
 ### Differences from MineClonia (so far)
 * Villagers can defend themselves from hostile mobs
+* Stranded villagers have a (rare) chance of building a house
+* Cats now retaliate and group with villagers when provoked
 * Illager class (pillagers, vindicators, evokers, vexes, illusioners) have common behaviour traits and can collaborate
 * Some illagers can craft and use explosives when attacking a villager structure
+* Illagers can share gunpowder with fellow illagers
 
 --- The following is the original MineClonia README ---
 
