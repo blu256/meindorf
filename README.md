@@ -1,12 +1,29 @@
-# Mineclonia
+# Meindorf
 
-[![ContentDB](https://content.minetest.net/packages/ryvnf/mineclonia/shields/downloads/)](https://content.minetest.net/packages/ryvnf/mineclonia/)
+Meindorf is a MineClonia fork with emphasis on village play.
 
-An unofficial Minecraft-like game for Minetest. Fork of MineClone 2 with focus
-on stability, multiplayer performance and features. For information about
-migrating from MineClone 2 to Mineclonia, see [MIGRATING.md](../../../src/branch/main/MIGRATING.md).
+This is a fork of the excellent MineClonia game which aims to create a different but familiar game experience
+by improving the village gameplay. The aim is not so much to stay true to 'original' Minecraft-style game as
+is to experiment with new gameplay elements, such as intoducing new mob behaviours, a bigger variety of items
+etc.
 
-Version: 0.108.0
+Based on MineClonia version 0.108.0
+
+## DISCLAIMER
+For now there is only a single inexperienced contributor to this game who can't guarantee regular updates
+(that's me). I still have a lot to learn about Lua, Luanti and MineClonia internals and so there might be
+bugs, spaghetti code and unexpected behaviour. Remember I'm doing this just for fun and as an excercise in
+Luanti modding.
+
+Contributors are welcome, of course :)
+See the IDEAS.md file for what might be coming in the future. If you can help make it, even better :)
+
+### Differences from MineClonia (so far)
+* Villagers can defend themselves from hostile mobs
+* Illager class (pillagers, vindicators, evokers, vexes, illusioners) have common behaviour traits and can collaborate
+* Some illagers can craft and use explosives when attacking a villager structure
+
+--- The following is the original MineClonia README ---
 
 ### Differences from MineClone 2
 * Overworld depth increased from 64 to 128 nodes
