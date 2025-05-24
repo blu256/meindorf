@@ -226,7 +226,7 @@ function mob_class:attack_players_and_npcs()
 			if obj:is_player() then
 				self:do_attack(obj)
 				break
-			elseif self.attack_npcs and (l and l.type == "npc") then
+			elseif (self.attack_npcs or self.type == "monster") and (l and l.type == "npc") then
 				self:do_attack(obj)
 				break
 			end
