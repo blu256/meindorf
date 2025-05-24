@@ -26,11 +26,83 @@ local RUNAWAY = "runaway"
 
 core.get_modpath("mcl_villages")
 
+function mobs_mc.villager_mob:get_a_name()
+	if not self.nametag then
+		local name = mobs_mc.villager_mob.names[math.random(0, #mobs_mc.villager_mob.names)]
+		if name then self.nametag = "Jan " .. name end
+	end
+end
+
 function mobs_mc.villager_mob:stand_still()
 	self.walk_chance = 0
 	self.jump = false
 	self:set_state("stand")
 end
+
+function mobs_mc.villager_mob:stop_standing_still()
+	self.walk_chance = 33
+	self.jump = true
+end
+
+-- function mobs_mc.villager_mob:find_partner()
+-- 	if self._partner then return self._partner end
+-- 	local partner = self:potential_partners_near()
+-- 	if partner and math.random(100) == 1 then
+-- 		self._partner = partner._id
+-- 		self._relationship = 1
+-- 		self:gopath(partner.object:get_pos(), function(self, _)
+-- 			if self._partner._relationship > 1 then
+-- 			end
+-- 			core.log(self.nametag.." now flirting with "..partner.nametag.." ("..self._gender.."+"..partner._gender..")")
+-- 		end)
+-- 	end
+-- end
+--
+-- function mobs_mc.villager_mob:relationship_chance()
+-- 	return math.random(100 + (self._relationship * 50)) == 1
+-- end
+--
+-- function mobs_mc.villager_mob:flirt()
+-- 	if self._relationship > 1 then return end
+-- 	if not self._partner then
+-- 		self:find_partner()
+-- 	end
+--
+-- 	if self._partner then
+-- 		if self:relationship_chance() then
+-- 			core.log("action", S("@1 initiating flirting with @2", self.nametag, self._partner.nametag))
+-- 			self:stand_still()
+-- 			self:look_at(self._partner.object:get_pos())
+-- 			self.show_particles("heart.png")
+-- 			if self._partner._relationship > 1 or not self:relationship_chance() then
+-- 				core.log("action", S("@1 not interested in flirting with @2", self._partner.nametag, self.nametag))
+-- 				self._rejected_partners[#self._rejected_partners + 1] = self._partner._id
+-- 				self._partner = nil
+-- 				self:stop_standing_still()
+-- 				self.show_particles("mcl_particles_smoke.png")
+-- 				return
+-- 			end
+-- 			core.log("action", S("@1 accepts flirting with @2", self._partner.nametag, self.nametag))
+-- 			self._partner._partner = self
+-- 			self._partner._relationship = 1
+-- 			self._partner:stand_still()
+-- 			self._partner:look_at(self.object:get_pos())
+-- 			self.show_particles("heart.png")
+-- 			self._partner.show_particles("heart.png")
+-- 			core.log("action", S("@1 and @2 are now dating", self.nametag, self._partner.nametag))
+-- 		end
+-- 	end
+-- end
+
+function mobs_mc.villager_mob:show_particles(texture)
+	if not self.object then return end
+	local pos = self.object:get_pos()
+	mcl_mobs.effect({x = pos.x, y = pos.y + 1, z = pos.z}, 8, texture, 3, 4, 1, 0.1)
+end
+
+-- function mobs_mc.villager_mob:stop_flirting()
+--
+-- end
 
 function mobs_mc.villager_mob:get_badge_textures()
     local p = mobs_mc.professions[self._profession]
@@ -375,6 +447,31 @@ function mobs_mc.villager_mob:has_summon_participants()
 	end
 	return r > 2
 end
+--[[
+function mobs_mc.villager_mob:potential_partners_near()
+	for o in core.objects_inside_radius(self.object:get_pos(), self.view_range)
+	do
+		local l = o:get_luaentity()
+		if l and l.name == "mobs_mc:villager" and l ~= self
+		and l._gender and l._attraction and not self._rejected_partners[l._id]
+		then
+			if l._gender == self._gender
+			then
+				if (l._attraction == "same" or l._attraction == "all")
+				and (self._attraction == "same" or self._attraction == "all")
+				then
+					return l
+				end
+			else
+				if (l._attraction == "different" or l._attraction == "all")
+				and (self._attraction == "different" or self._attraction == "all")
+				then
+					return l
+				end
+			end
+		end
+	end
+end]]
 
 function mobs_mc.villager_mob:summon_golem()
 	vector.offset(self.object:get_pos(),-10,-10,-10)
@@ -468,7 +565,7 @@ function mobs_mc.villager_mob:employ(jobsite_pos)
 	local m = minetest.get_meta(jobsite_pos)
 	local p = get_profession_by_jobsite(n.name)
 	if p and m:get_string("villager") == "" or m:get_string("villager") == self._id then
-		m:set_string("villager",self._id)
+		m:set_string("villager", self._id)
 		if self.nametag and self.nametag ~= "" then
 			m:set_string("infotext", S("@1 works here", self.nametag))
 		else
@@ -583,6 +680,7 @@ function mobs_mc.villager_mob:resettle_check()
 	if home then
 		local resettle = vector.distance(self.object:get_pos(), home) > RESETTLE_DISTANCE
 		if resettle then
+			core.log("action", self.nametag.." abandoned his village")
 			self:remove_job()
 			self:remove_bed()
 			self._bell = nil
@@ -590,7 +688,9 @@ function mobs_mc.villager_mob:resettle_check()
 		end
 	else
 		-- Chance of building something
-		local r = math.random(20000)
+		-- TODO IDEA 2000 - (10 * villager in area)
+		-- When building notify all vilagers in radius not to build anything
+		local r = math.random(2000)
 		core.log("change of building something: "..r.." (need 1)")
 		if r == 1 then
 			self:build()
@@ -690,6 +790,7 @@ function mobs_mc.villager_mob:go_to_town_bell()
 			local gp = self:gopath(bell, function(self)
 				if self then
 					self.order = GATHERING
+-- 					self:flirt()
 				end
 			end, true)
 
@@ -736,11 +837,15 @@ function mobs_mc.villager_mob:build()
 	local schematic
 	local job_chance = math.random(2)
 	if job_chance == 2 then
-		core.log("action", "build job")
+		if self.nametag then
+			core.chat_send_all(S("@1 built a jobsite!", self.nametag))
+		end
 		local choice = math.random(1, #mcl_villages.schematic_jobs)
 		schematic = mcl_villages.schematic_jobs[choice]
 	else
-		core.log("action", "build home")
+		if self.nametag then
+			core.chat_send_all(S("@1 built a home!", self.nametag))
+		end
 		local choice = math.random(1, #mcl_villages.schematic_houses)
 		schematic = mcl_villages.schematic_houses[choice]
 	end
@@ -811,6 +916,8 @@ function mobs_mc.villager_mob:do_activity(dtime)
 			if not self:take_bed() then
 				self._bed_search_interval = math.min(self._bed_search_interval + 5, 300)
 				-- since this is pretty expensive: if no bed is found increment search interval by 5 each time with cap at 5 minutes
+			else
+				core.log("action", self.nametag.." claimed a bed")
 			end
 		end
 	end
