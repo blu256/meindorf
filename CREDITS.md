@@ -1,5 +1,8 @@
 # Credits
 
+## Creator of Meindorf
+* blu.256
+
 ## Creators of Mineclonia
 * ryvnf
 * cora
@@ -10,7 +13,7 @@
 ## Creator of MineClone
 * davedevils
 
-## Active Contributors
+## Active Contributors (MineClonia)
 * codiac
 * DragonWrangler1
 * JoseDouglas26
@@ -127,6 +130,7 @@
 * Riu Sakura
 
 ## Special thanks
+* The MineClonia team for an excellent game
 * celeron55 for creating Minetest
 * Jordach for the jukebox music compilation from Big Freaking Dig
 * The workaholics who spent way too much time writing for the Minecraft Wiki.

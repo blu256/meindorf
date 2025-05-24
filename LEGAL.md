@@ -5,9 +5,10 @@ Copying is an act of love. Please copy and share! <3
 Here's the detailed legalese for those who need it:
 
 ## License of source code
-Mineclonia is an imitation of Minecraft.
+Meindorf is an imitation of Minecraft.
+Meindorf is a fork of MineClonia.
 
-Mineclonia is free software: you can redistribute it and/or modify it under the
+Meindorf is free software: you can redistribute it and/or modify it under the
 terms of the GNU General Public License as published by the Free Software
 Foundation, either version 3 of the License, or (at your option) any later
 version.
