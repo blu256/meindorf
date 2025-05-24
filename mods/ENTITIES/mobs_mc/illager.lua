@@ -1,6 +1,9 @@
 -- Common definitions for illagers
 -- Copyright (C) 2025 blu.256
 
+local modname = minetest.get_current_modname()
+local modpath = minetest.get_modpath(modname)
+
 mobs_mc.illager = {}
 
 local villager_nodes = {
@@ -21,8 +24,11 @@ local villager_nodes = {
 	"mcl_stonecutter:stonecutter"
 }
 
+dofile(modpath.."/villagers/names.lua")
+
 function mobs_mc.illager:summon_help()
 	local basepos = self.object:get_pos()
+	local pr = PseudoRandom(mcl_mapgen_core.get_block_seed(basepos))
 	local spawnpos = vector.add(basepos, minetest.yaw_to_dir(pr:next(0,360)))
 	local choice = math.random(10)
 	local mob = ""
@@ -97,7 +103,7 @@ function mobs_mc.illager:share_gunpowder(other, amount)
 	other:set_state("walk")
 end
 
-function mobs_mc.illager:place_explosives(self)
+function mobs_mc.illager:place_explosives()
 	if not self.place_tnt or self._gunpowder:get_count() < 5 then return end
 
 	local pos = self.object:get_pos()
@@ -135,22 +141,38 @@ function mobs_mc.illager:place_explosives(self)
 	end
 end
 
+
+
+function mobs_mc.illager:get_a_name()
+	if not self.nametag then
+		local name = mobs_mc.villager_mob.names[math.random(0, #mobs_mc.villager_mob.names)]
+		if name then self.nametag = "Van " .. name end
+	end
+end
+
 table.update(mobs_mc.illager, {
-	type = "monster",
+	type = "npc",
 	spawn_class = "hostile",
+	attacks_monsters = true,
+	attack_animals = true,
 	can_despawn = false,
-	pathfinding = 1,
+	pathfinding = 2,
 	place_tnt = false,
 	passive = false,
 	retaliates = true,
 	runaway = false,
-	attack_npcs = true,
 	physical = true,
+	hp_min = 30,
+	hp_max = 30,
+	xp_min = 6,
+	xp_max = 6,
+	view_range = 36,
 	specific_attack = {
 		"mobs_mc:villager",
 		"mobs_mc:cat",
 		"mobs_mc:witch",
-		"mobs_mc:wandering_trader"
+		"mobs_mc:wandering_trader",
+		"mobs_mc:iron_golem"
 	},
 	group_attack = {
 		"mobs_mc:pillager",
@@ -158,9 +180,6 @@ table.update(mobs_mc.illager, {
 		"mobs_mc:vex",
 		"mobs_mc:evoker",
 		"mobs_mc:illusioner"
-	},
-	runaway_from = {
-		"mobs_mc:iron_golem"
 	},
 	can_open_doors = true,
 	pick_up = {
@@ -172,6 +191,7 @@ table.update(mobs_mc.illager, {
 			..minetest.pos_to_string(self.object:get_pos())
 			..tostring(math.random()))
 
+		self:get_a_name()
 		self._emeralds = ItemStack("mcl_core:emerald 0")
 		if self.place_tnt then
 			if table.indexof(self.pick_up, "mcl_mobitems:gunpowder") == nil then
@@ -194,6 +214,9 @@ table.update(mobs_mc.illager, {
 		if self.place_tnt and self._gunpowder then
 			minetest.add_item(pos, self._gunpowder)
 		end
+		if self.nametag then
+			core.log(self.nametag.." died")
+		end
 
 		if self.on_illager_die then
 			self.on_illager_die(self)
@@ -215,6 +238,7 @@ table.update(mobs_mc.illager, {
 			local count = stack:get_count()
 			stack:take_item(count)
 			self._emeralds:set_count(self._emeralds:get_count() + count)
+			core.log(self.nametag.." picked up "..count.." emeralds")
 			return stack
 
 		-- Pick up gunpowder, used for making explosives
@@ -232,6 +256,7 @@ table.update(mobs_mc.illager, {
 				count = count * 5
 			end
 			self._gunpowder:set_count(self._gunpowder:get_count() + count)
+			core.log(self.nametag.." picked up "..count.." gunpowder")
 			return stack
 
 		-- Custom pick up implementation
@@ -256,7 +281,7 @@ table.update(mobs_mc.illager, {
 		if self.state == "gowp" then return true end
 
 		-- Summon help
-		if math.random(5000) == 1 and self._emeralds:get_count() > 1 then
+		if math.random(100) == 1 and self._emeralds:get_count() > 1 then
 			self._emeralds:set_count(self._emeralds:get_count() - 1)
 			self:summon_help()
 		end
@@ -276,39 +301,40 @@ table.update(mobs_mc.illager, {
 			then return true end
 		end
 
-		local loot = self:find_closest_loot(math.floor(self.view_range * .75), self.pick_up)
-		if loot then
-			local loot_pos = loot.object:get_pos()
-			local dist = vector.distance(self.object:get_pos(), loot_pos)
-			if self:gopath(loot.object:get_pos(), function(self)
-				if self then
-					self.on_pick_up(self, loot)
-					loot.object:remove()
-				end
-			end, true)
-			then return true end
-		end
+-- 		local loot = self:find_closest_loot(math.floor(self.view_range * .75), self.pick_up)
+-- 		if loot then
+-- 			local loot_pos = loot.object:get_pos()
+-- 			local dist = vector.distance(self.object:get_pos(), loot_pos)
+-- 			if self:gopath(loot.object:get_pos(), function(self)
+-- 				if self then
+-- 					self.on_pick_up(self, loot)
+-- 					loot.object:remove()
+-- 				end
+-- 			end, true)
+-- 			then return true end
+-- 		end
 
 		-- Look for villager structures and try to enter or bomb them
-		if math.random(500) == 1 then
+		if math.random(50) == 1 then
 			local pos = self.object:get_pos()
 
-			-- Prioritise everything except doors
-			local npos = minetest.find_node_near(pos, self.view_range, villager_nodes, true)
+			-- Prioritise doors
+			local npos = minetest.find_node_near(pos, self.view_range, {"group:door"}, true)
 			if not npos then
-				npos = minetest.find_node_near(pos, self.view_range, {"group:door"}, true)
+				npos = minetest.find_node_near(pos, self.view_range, villager_nodes, true)
 			end
 
 			if npos then
 				self:set_yaw(minetest.dir_to_yaw(vector.direction(npos, pos)))
 
 				local node = minetest.get_node(npos)
+				core.log(self.nametag.." found node "..node.name)
 				local dist = vector.distance(pos, npos)
 				if dist > 5 then
 					-- Find closest air block
-					local tpos = minetest.find_node_near(npos, 2, "air", true)
-					if tpos then
-						local gp = self:gopath(tpos, function(self)
+-- 					local tpos = minetest.find_node_near(npos, 2, "air", true)
+-- 					if tpos then
+						local gp = self:gopath(npos, function(self)
 							if self then
 								if math.random(100) == 1 and self.place_tnt then
 									self:place_explosives()
@@ -317,9 +343,10 @@ table.update(mobs_mc.illager, {
 								end
 							end
 						end)
-					end
+-- 					end
 				else
 					if math.random(100) == 1 and self.place_tnt then
+						core.log(self.nametag.." decided to place explosives")
 						self:place_explosives()
 					else
 						self:attack_specific()
