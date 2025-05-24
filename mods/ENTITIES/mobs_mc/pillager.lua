@@ -21,10 +21,6 @@ end
 
 mobs_mc.pillager_mob = table.merge(mobs_mc.illager, {
 	description = S("Pillager"),
-	hp_min = 24,
-	hp_max = 24,
-	xp_min = 6,
-	xp_max = 6,
 	breath_max = -1,
 	eye_height = 1.5,
 	shoot_interval = 3,
@@ -40,12 +36,10 @@ mobs_mc.pillager_mob = table.merge(mobs_mc.illager, {
 	view_range = 16,
 	fear_height = 4,
 	arrow = "mcl_bows:arrow_entity",
-	attack_type = "dogshoot", -- Alternate punching/shooting
+	attack_type = "shoot", -- Alternate punching/shooting
 	attack_npcs = true,
-	reach = 0, -- Punching max distance
-	damage = 0, -- Punching damage
 	dogshoot_switch = 1, -- Start of shooting
-	dogshoot_count_max = 5, -- Max time spent shooting (standing)
+	dogshoot_count_max = 3, -- Max time spent shooting (standing)
 	dogshoot_count2_max = 1, -- Max time spent punching (running),
 	place_tnt = true,
 	sounds = {
