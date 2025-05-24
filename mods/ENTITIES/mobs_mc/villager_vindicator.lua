@@ -15,17 +15,13 @@ dofile(modpath.."/illager.lua")
 
 mobs_mc.vindicator_mob = table.merge(mobs_mc.illager, {
 	description = S("Vindicator"),
-	hp_min = 24,
-	hp_max = 24,
-	xp_min = 6,
-	xp_max = 6,
 	collisionbox = {-0.3, -0.01, -0.3, 0.3, 1.94, 0.3},
 	visual = "mesh",
 	mesh = "mobs_mc_vindicator.b3d",
 	head_swivel = "head.control",
 	bone_eye_height = 2.2,
 	head_eye_height = 2.2,
-	curiosity = 10,
+	curiosity = 20,
 	textures = {
 	{
 			"mobs_mc_vindicator.png",
@@ -36,7 +32,7 @@ mobs_mc.vindicator_mob = table.merge(mobs_mc.illager, {
 	},
 	visual_size = {x=2.75, y=2.75},
 	makes_footstep_sound = true,
-	damage = 13,
+	damage = 6,
 	reach = 2,
 	walk_velocity = 1.2,
 	run_velocity = 1.6,
